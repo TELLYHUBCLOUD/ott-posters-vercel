@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   try {
     const browser = await puppeteer.launch({
       headless: 'new',
-      executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
+      //executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
