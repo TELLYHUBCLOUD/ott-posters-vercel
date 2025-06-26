@@ -7,9 +7,10 @@ export default async function handler(req, res) {
   try {
     const browser = await puppeteer.launch({
       headless: 'new',
-      executablePath: process.env.CHROME_BIN || '/usr/bin/google-chrome',
+      executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
+
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2' });
