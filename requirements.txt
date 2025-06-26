@@ -7,3 +7,4 @@ pymongo==4.3.3
 dnspython==2.3.0
 python-dotenv==0.21.0
 motor==3.1.1  # Async MongoDB driver (optional for async implementations)
+aiofiles==23.2.1  # Add this line
