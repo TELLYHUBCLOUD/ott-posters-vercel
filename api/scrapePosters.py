@@ -3,8 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 from datetime import datetime
-from lib.db import save_to_db
-
+from lib.db import db
 # Configuration
 OTT_PLATFORMS = {
     'netflix': 'https://www.netflix.com/in/',
@@ -17,6 +16,9 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
 
+
+# ... (other imports remain the same)
+
 def scrape_ott_posters(platform):
     """Scrape posters from a specific OTT platform"""
     try:
@@ -26,7 +28,7 @@ def scrape_ott_posters(platform):
         soup = BeautifulSoup(response.text, 'html.parser')
         posters = []
         
-        # Example: Netflix poster scraping (adjust selectors as needed)
+        # Example: Netflix poster scraping
         if platform == 'netflix':
             items = soup.select('.title-card-container')
             for item in items:
@@ -34,20 +36,19 @@ def scrape_ott_posters(platform):
                     'title': item.select_one('.title-card-title').text.strip(),
                     'image_url': item.select_one('img')['src'],
                     'platform': platform,
-                    'scraped_at': datetime.now().isoformat()
+                    'scraped_at': datetime.now()
                 }
                 posters.append(poster)
         
-        # Save to database and JSON file
-        save_to_db(posters)
+        # Save to MongoDB
+        db.save_to_db(posters)
         update_json_file(posters)
         
         return posters
     
     except Exception as e:
-        print(f"Error scraping {platform}: {e}")
+        logger.error(f"Error scraping {platform}: {e}")
         return []
-
 def update_json_file(data):
     """Update the JSON file with new posters"""
     try:
