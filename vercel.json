@@ -22,6 +22,10 @@
     {
       "src": "/",
       "dest": "/pages/index.py"
+    },
+    {
+      "src": "/",
+      "dest": "/main.py"
     }
   ]
 }
