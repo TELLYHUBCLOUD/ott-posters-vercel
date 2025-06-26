@@ -9,9 +9,9 @@ export default async function handler(req, res) {
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2' });
     await page.waitForSelector(selector);
-    const posterUrls = await page.$$eval(selector, imgs => imgs.map(img => img.src));
+    const posters = await page.$$eval(selector, imgs => imgs.map(img => img.src));
     await browser.close();
-    res.status(200).json({ posters: posterUrls });
+    res.status(200).json({ posters });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
