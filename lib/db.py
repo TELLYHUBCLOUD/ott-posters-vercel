@@ -1,71 +1,68 @@
-import sqlite3
-import os
+from pymongo import MongoClient
 from datetime import datetime
-from fastapi import FastAPI, HTTPException
-import json
-DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'ott_posters.db')
+import os
+from dotenv import load_dotenv
+import logging
 
-def init_db():
-    """Initialize the SQLite database"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS posters (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            image_url TEXT UNIQUE NOT NULL,
-            platform TEXT NOT NULL,
-            scraped_at TEXT NOT NULL
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
+# Load environment variables
+load_dotenv()
 
-def save_to_db(posters):
-    """Save posters to the database"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    for poster in posters:
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class MongoDB:
+    def __init__(self):
+        self.uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
+        self.db_name = os.getenv('MONGODB_DBNAME', 'ott_posters')
+        self.client = None
+        self.db = None
+        self.connect()
+
+    def connect(self):
         try:
-            cursor.execute('''
-                INSERT OR IGNORE INTO posters (title, image_url, platform, scraped_at)
-                VALUES (?, ?, ?, ?)
-            ''', (
-                poster['title'],
-                poster['image_url'],
-                poster['platform'],
-                poster['scraped_at']
-            ))
+            self.client = MongoClient(self.uri)
+            self.db = self.client[self.db_name]
+            logger.info("Connected to MongoDB successfully")
         except Exception as e:
-            print(f"Error saving poster to DB: {e}")
-    
-    conn.commit()
-    conn.close()
+            logger.error(f"Error connecting to MongoDB: {e}")
+            raise
 
-def get_recent_posters(platform=None, limit=10):
-    """Retrieve recent posters from the database"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    query = 'SELECT * FROM posters'
-    params = []
-    
-    if platform:
-        query += ' WHERE platform = ?'
-        params.append(platform)
-    
-    query += ' ORDER BY scraped_at DESC LIMIT ?'
-    params.append(limit)
-    
-    cursor.execute(query, params)
-    columns = [column[0] for column in cursor.description]
-    results = [dict(zip(columns, row)) for row in cursor.fetchall()]
-    
-    conn.close()
-    return results
+    def save_to_db(self, posters):
+        """Save posters to MongoDB"""
+        try:
+            collection = self.db.posters
+            result = collection.insert_many(
+                posters,
+                ordered=False  # Continue on duplicate key errors
+            )
+            logger.info(f"Inserted {len(result.inserted_ids)} posters")
+            return result.inserted_ids
+        except Exception as e:
+            logger.error(f"Error saving posters: {e}")
+            return []
 
-# Initialize database on import
-init_db()
+    def get_recent_posters(self, platform=None, limit=10):
+        """Retrieve recent posters from MongoDB"""
+        try:
+            collection = self.db.posters
+            query = {}
+            if platform:
+                query['platform'] = platform
+            
+            posters = collection.find(query).sort(
+                'scraped_at', -1  # Descending order
+            ).limit(limit)
+            
+            return list(posters)
+        except Exception as e:
+            logger.error(f"Error retrieving posters: {e}")
+            return []
+
+    def close(self):
+        """Close MongoDB connection"""
+        if self.client:
+            self.client.close()
+
+# Singleton instance
+db = MongoDB()
