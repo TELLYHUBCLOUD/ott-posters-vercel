@@ -9,7 +9,7 @@ let botStartTime = Date.now();
 
 const browser = await puppeteer.launch({
   headless: 'new',
-  executablePath: process.env.CHROME_BIN || '/usr/bin/google-chrome',
+  ///executablePath: process.env.CHROME_BIN || '/usr/bin/google-chrome',
   args: ['--no-sandbox', '--disable-setuid-sandbox']
 });
 
