@@ -42,7 +42,8 @@ Object.keys(ottConfig).forEach(platform => {
     try {
       browser = await puppeteer.launch({ 
         headless: "new", 
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH
       });
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: 'networkidle2' });
