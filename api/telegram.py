@@ -2,7 +2,7 @@ import os
 import requests
 from telegram import Update, Bot
 from telegram.ext import CommandHandler, MessageHandler, Filters, Updater
-from lib.db import get_recent_posters
+from lib.db import db
 
 # Telegram bot setup
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -20,7 +20,7 @@ def send_posters(update: Update, context):
     """Send posters based on platform"""
     try:
         platform = context.args[0] if context.args else 'netflix'
-        posters = get_recent_posters(platform, limit=5)
+        posters = db.get_recent_posters(platform, limit=5)
         
         if not posters:
             update.message.reply_text(f"No posters found for {platform}")
