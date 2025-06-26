@@ -17,7 +17,8 @@ COPY . .
 
 EXPOSE 3000
 
-ENV CHROME_BIN=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV NODE_ENV=production
 
 CMD ["npm", "run", "start"]
