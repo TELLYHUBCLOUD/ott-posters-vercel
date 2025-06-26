@@ -4,17 +4,6 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 import json
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'ott_posters.db')
-app = FastAPI()
-
-@app.get("/")
-async def read_root():
-    try:
-        json_path = os.path.join(os.path.dirname(__file__), '..', 'ott-posters.json')
-        with open(json_path, 'r') as f:
-            posters = json.load(f)
-        return {"posters": posters[:20]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 def init_db():
     """Initialize the SQLite database"""
