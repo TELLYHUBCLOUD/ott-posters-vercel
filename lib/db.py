@@ -2,7 +2,8 @@ import sqlite3
 import os
 from datetime import datetime
 
-DB_PATH = 'ott_posters.db'
+DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'ott_posters.db')
+
 
 def init_db():
     """Initialize the SQLite database"""
