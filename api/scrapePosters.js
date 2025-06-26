@@ -1,26 +1,20 @@
-import puppeteer from 'puppeteer';
+import * as cheerio from 'cheerio';
 
 export default async function handler(req, res) {
   const { url, selector } = req.query;
   if (!url || !selector) return res.status(400).json({ error: 'Missing params' });
 
-  let browser;
   try {
-    browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH
-    });
-
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    await page.waitForSelector(selector);
-    const posters = await page.$$eval(selector, imgs => imgs.map(img => img.src));
-    await browser.close();
+    const response = await fetch(url);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    const posters = $(selector)
+      .map((_, img) => $(img).attr('src'))
+      .get();
 
     res.status(200).json({ posters });
   } catch (err) {
-    if (browser) await browser.close();
     res.status(500).json({ error: err.message });
   }
 }
