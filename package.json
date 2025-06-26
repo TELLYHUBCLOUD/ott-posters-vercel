@@ -1,19 +1,18 @@
 {
-  "name": "ott-posters-vercel",
+  "name": "ott-posters-scraper",
   "version": "1.0.0",
-  "type": "module",
+  "description": "OTT Posters Scraper API, Bot, and Webpage",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "start": "python -m uvicorn pages.index:app --reload",
+    "scrape": "python api/scrapePosters.py",
+    "bot": "python api/telegram.py"
   },
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "mongoose": "^8.0.0",
-    "next": "^14.1.0",
-    "puppeteer": "^22.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "telegraf": "^4.16.0"
+    "fastapi": "^0.68.0",
+    "uvicorn": "^0.15.0",
+    "requests": "^2.26.0",
+    "beautifulsoup4": "^4.10.0",
+    "python-telegram-bot": "^13.7",
+    "sqlite3": "^4.0.0"
   }
 }
