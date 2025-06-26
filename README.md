@@ -122,19 +122,6 @@ Open a Pull Request
 MIT 
 https://img.shields.io/badge/License-MIT-blue.svg
 
-```
-This single code block contains:
-1. All headers and sections properly formatted
-2. Correct Markdown syntax for badges, code blocks, and tables
-3. Consistent spacing and alignment
-4. Complete installation and deployment instructions
-5. Clear environment variables section
-6. Well-formatted command table
-7. Contribution guidelines
-8. License information
-
-```
-
 
 ```
 npm run dev
