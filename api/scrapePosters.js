@@ -1,0 +1,18 @@
+import puppeteer from 'puppeteer';
+
+export default async function handler(req, res) {
+  const { url, selector } = req.query;
+  if (!url || !selector) return res.status(400).json({ error: 'Missing params' });
+
+  try {
+    const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.waitForSelector(selector);
+    const posterUrls = await page.$$eval(selector, imgs => imgs.map(img => img.src));
+    await browser.close();
+    res.status(200).json({ posters: posterUrls });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
