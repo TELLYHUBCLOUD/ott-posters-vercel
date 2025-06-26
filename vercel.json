@@ -1,9 +1,35 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/scrapePosters.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/telegram.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "pages/index.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
     {
+      "src": "/api/scrape",
+      "dest": "/api/scrapePosters.py"
+    },
+    {
       "src": "/api/telegram",
-      "dest": "/api/telegram.js"
+      "dest": "/api/telegram.py"
+    },
+    {
+      "src": "/",
+      "dest": "/pages/index.py"
+    },
+    {
+      "src": "/api/posters",
+      "dest": "/pages/index.py"
     }
   ]
 }
