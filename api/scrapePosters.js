@@ -1,21 +1,31 @@
-import * as cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 
 export default async function handler(req, res) {
   const { url, selector } = req.query;
-  
+
+  // Validate query params
+  if (!url || !selector) {
+    return res.status(400).json({ error: 'Missing url or selector parameter.' });
+  }
+
   try {
-    // Use a proxy API to fetch JS-rendered HTML
-    const proxyUrl = `https://api.scraperapi.com?api_key=${process.env.SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-    const response = await fetch(proxyUrl);
-    const html = await response.text();
-    
-    const $ = cheerio.load(html);
-    const posters = $(selector)
-      .map((_, img) => $(img).attr('src'))
-      .get();
-    
-    res.status(200).json({ posters });
+    // Launch Puppeteer with bundled Chromium
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.waitForSelector(selector);
+
+    const posters = await page.$$eval(selector, imgs => imgs.map(img => img.src));
+
+    await browser.close();
+
+    return res.status(200).json({ posters });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('[Scrape Error]', err);
+    return res.status(500).json({ error: err.message });
   }
 }
