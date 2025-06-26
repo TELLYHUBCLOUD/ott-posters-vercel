@@ -7,6 +7,13 @@ import ottConfig from '../../ott-posters.json' assert { type: "json" };
 const bot = new Telegraf(process.env.BOT_TOKEN);
 let botStartTime = Date.now();
 
+const browser = await puppeteer.launch({
+  headless: "new",
+  executablePath: process.env.CHROME_BIN || '/usr/bin/google-chrome',
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
+});
+
+
 const userSchema = new mongoose.Schema({
   telegramId: Number,
   firstName: String,
